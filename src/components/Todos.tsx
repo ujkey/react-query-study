@@ -9,15 +9,27 @@ interface Todo {
     userId: number;
 }
 
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    address: any[]; //TODO: address interface
+    phone: string;
+    website: string;
+    company: any[]; //TODO: company interface
+
+}
+
 const Todos = () => {
     const [todos, setTodos] = useState([]);
+    const [users, setUsers] = useState([]);
 
-    const { status, data, error } = useQuery('todos', http.fetchTodoList, {
+    const { status, data: todoList, error } = useQuery('todos', http.fetchTodoList, {
         refetchOnWindowFocus: false,
         retry: 0, // 실패시 재호출 횟수 지정
         onSuccess: (data) => {
             // 서버에서 데이터를 받아오는데 성공했을 때 호출되는 함수
-            console.log('onSuccess', data.data);
+            console.log('todo data', data.data);
             setTodos(data?.data.slice(0,10));
         },
         onError: (error) => {
@@ -25,16 +37,31 @@ const Todos = () => {
             console.log('onError', error);
         },
     });
+
+    const { status: status_user, data: userList, error: error_user } = useQuery('users', http.fetchUserList, { 
+        enabled: !!todoList, // true가 되면 http.fetchUserList를 실행
+        onSuccess: (data) => {
+            console.log('user data', data.data);
+            setUsers(data?.data.slice(0,10));
+        }, 
+    });
     
     if(status === 'loading') return <span>Loading...</span>;
     if(status === 'error') return <span>Error: {error}</span>;
 
     return (
-        <ul>
-            {todos.map((todo: Todo) => (
-                <li key={todo.id}>{todo.title}</li>
-            ))}
-        </ul>
+        <>
+            <ul>
+                {todos.map((todo: Todo) => (
+                    <li key={todo.id}>{todo.title}</li>
+                ))}
+            </ul>
+            <ul>
+                {users.map((user: User) => (
+                    <li key={user.id}>{user.name}</li>
+                ))}
+            </ul>
+        </>
     );
 };
 
