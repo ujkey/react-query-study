@@ -12,7 +12,7 @@ interface Todo {
 const Todos = () => {
     const [todos, setTodos] = useState([]);
 
-    const { isLoading, isError, data, error } = useQuery('todos', http.fetchTodoList, {
+    const { status, data, error } = useQuery('todos', http.fetchTodoList, {
         refetchOnWindowFocus: false,
         retry: 0, // 실패시 재호출 횟수 지정
         onSuccess: (data) => {
@@ -26,8 +26,8 @@ const Todos = () => {
         },
     });
     
-    if(isLoading) return <span>Loading...</span>;
-    if(isError) return <span>Error: {error}</span>;
+    if(status === 'loading') return <span>Loading...</span>;
+    if(status === 'error') return <span>Error: {error}</span>;
 
     return (
         <ul>
