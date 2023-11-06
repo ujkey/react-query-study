@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import http from '@/api/http';
-import { useQuery } from 'react-query';
+import { useQueries, useQuery } from 'react-query';
 
 interface Todo {
     id: number;
@@ -23,6 +23,22 @@ interface User {
 const Todos = () => {
     const [todos, setTodos] = useState([]);
     const [users, setUsers] = useState([]);
+    const result = useQueries([
+        {
+            queryKey: 'posts',
+            queryFn: http.fetchPostList,
+        }, 
+        {
+            queryKey: 'comments',
+            queryFn: http.fetchCommentList,
+        }
+    ]);
+
+    useEffect(() => {
+        console.log('result', result);
+        const loadingFinishAll = result.some(result => result.isLoading);
+        console.log('loadingFinishAll', loadingFinishAll); //loadingFinishAll이 false이면 완료
+    }, [result]);
 
     const { status, data: todoList, error } = useQuery('todos', http.fetchTodoList, {
         refetchOnWindowFocus: false,
