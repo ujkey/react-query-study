@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { Post } from '../types';
 
 class Https {
+    // Get
     fetchTodoList = () => {
         return axios.get('https://jsonplaceholder.typicode.com/todos');
     }
@@ -15,7 +17,12 @@ class Https {
 
     fetchCommentList = () => {
         return axios.get('https://jsonplaceholder.typicode.com/comments');
-    }   
+    } 
+    
+    // Create
+    createPost = (post: Post) => {
+        return axios.post(`https://jsonplaceholder.typicode.com/posts`, post);
+    }
 }
 
 export default new Https();
