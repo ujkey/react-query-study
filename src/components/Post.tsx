@@ -12,9 +12,9 @@ export default function Post() {
     const [body, setBody] = useState<string>('');
     const queryClient = useQueryClient();
 
-    const { status, data, error } = useQuery<Post[]>('posts', http.fetchPostList, {
+    const { status, data, error } = useQuery('posts', http.fetchPostList, {
         onSuccess: (data) => {
-            console.log('Posts data', data.data);
+            console.log('Posts data', data);
         },
         onError: (error) => {
             console.log('onError', error);
@@ -29,7 +29,10 @@ export default function Post() {
         onSuccess: (data, variables, context) => {
             // onSuccess : 성공했을 때 호출
             console.log("Success", data, variables, context);
-            queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출
+            // queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출(캐싱된 쿼리를 무효화)
+
+            const allPosts = queryClient.getQueryData('posts');
+            queryClient.setQueryData('posts', [...allPosts.data, data.data]); // 'posts' 쿼리의 데이터를 수동 업데이트
         },
         onError: (error, variable, context) => {
             // onError : 실패했을 때 호출
@@ -58,6 +61,12 @@ export default function Post() {
             <TextField label="body" value={body} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBody(e.target.value)} />
             
             <Button variant="outlined" onClick={handleSumit}>Create Post</Button>
+
+            {/* <ul>
+                {posts && posts?.map((post: Post) => (
+                    <li key={post.id}>{post.id}</li>
+                ))}
+            </ul> */}
         </>
     );
 };
