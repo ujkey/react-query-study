@@ -4,24 +4,28 @@ import { Post } from '../types';
 class Https {
     // Get
     fetchTodoList = () => {
-        return axios.get('https://jsonplaceholder.typicode.com/todos');
+        return axios.get('http://localhost:9999/todos');
+    }
+
+    fetchPost = (id: number) => {
+        return axios.get(`http://localhost:9999/posts/${id}`);
     }
 
     fetchUserList = () => {
-        return axios.get('https://jsonplaceholder.typicode.com/users');
+        return axios.get('http://localhost:9999/users');
     }
 
     fetchPostList = () => {
-        return axios.get('https://jsonplaceholder.typicode.com/posts');
+        return axios.get('http://localhost:9999/posts');
     }
 
     fetchCommentList = () => {
-        return axios.get('https://jsonplaceholder.typicode.com/comments');
+        return axios.get('http://localhost:9999/comments');
     } 
     
     // Create
     createPost = (post: Post) => {
-        return axios.post(`https://jsonplaceholder.typicode.com/posts`, post);
+        return axios.post(`http://localhost:9999/posts/`, post);
     }
 }
 
