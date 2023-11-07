@@ -1,24 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import http from '@/api/http';
 import { useQueries, useQuery } from 'react-query';
-
-interface Todo {
-    id: number;
-    title: string;
-    completed: boolean;
-    userId: number;
-}
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    address: any[]; //TODO: address interface
-    phone: string;
-    website: string;
-    company: any[]; //TODO: company interface
-
-}
+import { Todo, User } from '../types';
 
 const Todos = () => {
     const [todos, setTodos] = useState([]);
