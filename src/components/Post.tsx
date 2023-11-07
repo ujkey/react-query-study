@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation } from "react-query";
+import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { Button, TextField, Typography } from "@mui/material";
 import http from "@/api/http";
 import { Post } from "../types";
@@ -10,6 +10,16 @@ export default function Post() {
     const [userId, setUserId] = useState<number>(0);
     const [title, setTitle] = useState<string>('');
     const [body, setBody] = useState<string>('');
+    const queryClient = useQueryClient();
+
+    const { status, data, error } = useQuery<Post[]>('posts', http.fetchPostList, {
+        onSuccess: (data) => {
+            console.log('Posts data', data.data);
+        },
+        onError: (error) => {
+            console.log('onError', error);
+        },
+    });
 
     const postMutation = useMutation(http.createPost, {
         onMutate: variable => {
@@ -19,6 +29,7 @@ export default function Post() {
         onSuccess: (data, variables, context) => {
             // onSuccess : 성공했을 때 호출
             console.log("Success", data, variables, context);
+            queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출
         },
         onError: (error, variable, context) => {
             // onError : 실패했을 때 호출
