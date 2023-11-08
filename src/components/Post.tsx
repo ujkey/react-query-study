@@ -13,8 +13,9 @@ export default function Post() {
     const [body, setBody] = useState<string>('');
     const queryClient = useQueryClient();
 
-    const { status, data: allPosts, error } = useQuery('posts', http.fetchPostList, {
+    const { status, data: allPosts, error, refetch: fetchPostList } = useQuery(['posts'], http.fetchPostList, {
         suspense: true, // 개별 쿼리에 suspense 옵션을 주면 해당 쿼리가 로딩 중일 때 Suspense를 발생시킴
+        enabled: false, // enabled: false로 설정하면 쿼리를 수동으로 호출해야 함
         onSuccess: (data) => {
             console.log('Posts data', data);
         },
@@ -31,7 +32,13 @@ export default function Post() {
         onSuccess: (data, variables, context) => {
             // onSuccess : 성공했을 때 호출
             console.log("Success", data, variables, context);
-            queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출(캐싱된 쿼리를 무효화)
+
+            // queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출(캐싱된 쿼리를 무효화)
+            /*
+                `enabled: false`로 설정된 쿼리는 invalidateQueries로 캐시를 무효화한 하여도 다시 호출되지 않음
+                useQuery의 refetch를 사용하여 쿼리를 다시 호출해야 함
+            */
+            fetchPostList();
 
             // const allPosts = queryClient.getQueryData('posts');
             // queryClient.setQueryData('posts', [...allPosts.data, data.data]); // 'posts' 쿼리의 데이터를 수동 업데이트
