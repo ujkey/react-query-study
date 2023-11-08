@@ -7,6 +7,11 @@ const queryClient = new QueryClient({}); // default: 전처리하지 않음
 
 // QueryCache로 쿼리에 대한 성공, 실패 전처리하기
 // const queryClient = new QueryClient({
+//   defaultOptions: {
+//     queries: {
+//       suspense: true, //Suspense 옵션 설정(global)
+//     },
+//   },
 //   queryCache: new QueryCache({
 //     onError: (error, query) => {
 //       console.log(error, query);

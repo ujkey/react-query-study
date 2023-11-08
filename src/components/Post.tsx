@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import { QueryClient, useMutation, useQuery, useQueryClient } from "react-query";
 import { Button, TextField, Typography } from "@mui/material";
 import http from "@/api/http";
 import { Post } from "../types";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
 
 export default function Post() {
@@ -12,7 +13,8 @@ export default function Post() {
     const [body, setBody] = useState<string>('');
     const queryClient = useQueryClient();
 
-    const { status, data, error } = useQuery('posts', http.fetchPostList, {
+    const { status, data: allPosts, error } = useQuery('posts', http.fetchPostList, {
+        suspense: true, // 개별 쿼리에 suspense 옵션을 주면 해당 쿼리가 로딩 중일 때 Suspense를 발생시킴
         onSuccess: (data) => {
             console.log('Posts data', data);
         },
@@ -20,7 +22,7 @@ export default function Post() {
             console.log('onError', error);
         },
     });
-
+ 
     const postMutation = useMutation(http.createPost, {
         onMutate: variable => {
             // onMutate : mutate가 호출되기 전에 호출
@@ -29,10 +31,10 @@ export default function Post() {
         onSuccess: (data, variables, context) => {
             // onSuccess : 성공했을 때 호출
             console.log("Success", data, variables, context);
-            // queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출(캐싱된 쿼리를 무효화)
+            queryClient.invalidateQueries('posts'); // posts 쿼리를 다시 호출(캐싱된 쿼리를 무효화)
 
-            const allPosts = queryClient.getQueryData('posts');
-            queryClient.setQueryData('posts', [...allPosts.data, data.data]); // 'posts' 쿼리의 데이터를 수동 업데이트
+            // const allPosts = queryClient.getQueryData('posts');
+            // queryClient.setQueryData('posts', [...allPosts.data, data.data]); // 'posts' 쿼리의 데이터를 수동 업데이트
         },
         onError: (error, variable, context) => {
             // onError : 실패했을 때 호출
@@ -62,11 +64,15 @@ export default function Post() {
             
             <Button variant="outlined" onClick={handleSumit}>Create Post</Button>
 
-            {/* <ul>
-                {posts && posts?.map((post: Post) => (
-                    <li key={post.id}>{post.id}</li>
-                ))}
-            </ul> */}
+            <Suspense fallback={<div>Loading...</div>}>
+                <ErrorBoundary fallback={<div>Error</div>}>
+                    <ul>
+                        {allPosts && allPosts.data.map((post: Post) => (
+                            <li key={post.id}>{post.id}</li>
+                        ))}
+                    </ul>
+                </ErrorBoundary>
+            </Suspense>
         </>
     );
 };
